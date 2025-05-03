@@ -1,0 +1,132 @@
+.app-container {
+    background-color: #001f3f; /* dark blue */
+    color: white;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    font-family: sans-serif;
+}
+  
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #003366;
+    padding: 16px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+  
+.settings-button {
+    background-color: #004080;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+  
+.settings-button:hover {
+    background-color: #0055aa;
+}
+  
+.main-content {
+    display: flex;
+    flex: 1;
+    padding: 16px;
+    gap: 16px;
+}
+
+.song-list {
+    width: 30%;
+    height: 650px;
+    overflow-y: hidden;
+}
+  
+#queue-container {
+    margin-top: 10px;
+} 
+
+.song-item {
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;  
+    overflow: hidden;
+    border-radius: 4px;
+}
+
+.name-item {
+    overflow: hidden;
+}
+
+.song-action {
+    margin-left: 12px;
+    cursor: pointer;
+    font-size: 18px;
+    color: #ffffff;
+    transition: color 0.2s;
+    font-weight: bolder;
+}
+  
+.song-action:hover {
+    color: #3950fc;
+}
+  
+.video-section {
+    flex: 1;
+    background-color: black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    border-radius: 8px;
+    height: 80%;
+}
+  
+.button-bar {
+    display: flex;
+    justify-content: left;
+    gap: 16px;
+    padding: 16px;
+    background-color: #003366;
+}
+  
+.action-button {
+    background-color: #0069d8;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 100px;
+}
+  
+.action-button:hover {
+    background-color: #0056b3;
+}
+
+.scroll-message-container {
+    overflow: hidden;
+    width: 80%;
+    padding: 12px 24px;
+}
+
+.scroll-message {
+    white-space: nowrap;
+    animation: scroll-left 20s linear;
+    color: #ffffff;
+    font-size: 16px;
+    padding-left: 120%;
+}
+
+@keyframes scroll-left {
+    from {
+        transform: translateX(0%);
+    }
+    to {
+        transform: translateX(-150%);
+    }
+}
+
+  

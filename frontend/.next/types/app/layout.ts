@@ -1,4 +1,4 @@
-// File: /Users/apple/Desktop/Coding/Discord/Karaoke/frontend/src/app/layout.tsx
+// File: /Users/apple/Desktop/Coding/Discord/Karaoke_with_discord/frontend/src/app/layout.tsx
 import * as entry from '../../../src/app/layout.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

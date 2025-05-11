@@ -67,7 +67,7 @@ async def help(ctx):
 
 # Flask app setup
 app = Flask(__name__)
-CORS(app, origins=["http://localhost:3000", "http://172.16.9.181:3000", "http://publichost:3000", "http://128.61.115.246:3000", "http://172.16.9.181:3000"])
+CORS(app, origins=["http://localhost:3000", "http://172.16.9.181:3000", "http://publichost:3000", "http://128.61.115.246:3000", "http://172.16.9.181:3000", "https://karaoke-with-discord-9k8je1lg1-thomas40522s-projects.vercel.app"])
 
 @app.route('/get_queue')
 def get_queue():

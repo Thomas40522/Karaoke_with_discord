@@ -56,7 +56,7 @@ export default function Home() {
       clearInterval(interval2);
       clearInterval(interval3);
     };
-  },[])
+  },[backend_endpoint])
 
   function Get_Max_Song() {
     fetch(backend_endpoint + '/get_max_song', {
@@ -425,6 +425,9 @@ export default function Home() {
             <label>
               Backend Endpoint:
               <input type="string" value={backend_endpointTemp} onChange={(e) => setBackend_endpointTemp(e.target.value)}/>
+            </label>
+            <label>Suggested Link: 
+              <input type="string" value={clientUrlTemp+"/client?backend="+backend_endpoint}/>
             </label>
             <button className="settings-button" onClick={handle_save}>Save</button>
             <button className="settings-button" onClick={handle_restore}>Default</button>

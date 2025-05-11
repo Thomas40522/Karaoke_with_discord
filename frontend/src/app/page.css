@@ -17,7 +17,7 @@
 }
   
 .settings-button {
-    background-color: #004080;
+    background-color: #004b97;
     color: white;
     border: none;
     padding: 8px 16px;
@@ -38,8 +38,9 @@
 
 .song-list {
     width: 30%;
-    height: 650px;
+    height: 70vh;
     overflow-y: hidden;
+    overflow-x: auto
 }
   
 #queue-container {
@@ -130,3 +131,37 @@
 }
 
   
+
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex; justify-content: center; align-items: center;
+    z-index: 999;
+}
+
+.modal-content {
+    background: #003366;
+    padding: 2rem;
+    border-radius: 8px;
+    height: fit-content;
+    width: 350px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.modal-content h2 {
+    margin-top: 0;
+}
+
+.modal-content label {
+    display: block;
+    margin: 1rem 0;
+}
+
+.modal-content button {
+    margin-top: 1rem;
+}
+
+.modal-content input {
+    margin-left: 10px;
+}

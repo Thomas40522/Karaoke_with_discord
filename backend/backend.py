@@ -17,6 +17,7 @@ bot = commands.Bot(command_prefix='!', intents=intents, help_command=None)
 queue = []
 text_to_fire = []
 max_song = 20
+video_dimension = ['640', '1200']
 
 @bot.event
 async def on_ready():
@@ -31,8 +32,9 @@ async def sing(ctx, *, args: str):
     match = re.match(r'\{(.+?)\}\s+(\S+)', args)
     if match:
         name = match.group(1)
+        name_with_user = name + " - " + str(ctx.author)
         url = match.group(2)
-        queue.append((name, url))
+        queue.append((name_with_user, url))
         await ctx.send(f"{ctx.author.mention} Added song: **{name}** with URL: {url}")
     else:
         await ctx.send(f"{ctx.author.mention} Invalid format. Use: `!sing {{song name}} Youtube URL`")
@@ -101,6 +103,7 @@ def get_max_song():
 
 @app.route('/set_max_song', methods=['POST'])
 def set_max_song():
+    global max_song
     data = request.get_json()
     max_num = data.get('max_song')
     
@@ -110,7 +113,25 @@ def set_max_song():
     if max_num < 1:
         return jsonify({'error': 'Max number cannot be smaller then 1'}), 400
     
-    max_song = max_num
+    if max_num < len(queue):
+        return jsonify({'error': 'Max song number cannot be smaller then the current queue length'}), 400
+    
+    max_song = int(max_num)
+    return jsonify(max_song)
+
+@app.route('/get_video_dimension')
+def get_video_dimension():
+    return jsonify(video_dimension)
+
+@app.route('/set_video_dimension', methods=['POST'])
+def set_video_dimension():
+    global video_dimension
+    data = request.get_json()
+    video_height = data.get('video_height')
+    video_width = data.get('video_width')
+    
+    video_dimension = [video_height, video_width]
+    return jsonify(video_dimension)
 
 @app.route('/fire_text')
 def fire_text():

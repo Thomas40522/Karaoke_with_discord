@@ -15,12 +15,21 @@
     padding: 16px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
 }
+
+#top-text {
+    display: flex;
+}
+
+#top-text h1 {
+    margin-right: 10px;
+}
   
 .settings-button {
     background-color: #004b97;
     color: white;
     border: none;
     padding: 8px 16px;
+    margin-right: 10px;
     border-radius: 4px;
     cursor: pointer;
 }
@@ -38,13 +47,17 @@
 
 .song-list {
     width: 30%;
-    height: 70vh;
+    height: 79vh;
     overflow-y: hidden;
-    overflow-x: auto
+    overflow-x: auto;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column
 }
   
 #queue-container {
     margin-top: 10px;
+    height: 60vh;
 } 
 
 .song-item {
@@ -145,7 +158,7 @@
     padding: 2rem;
     border-radius: 8px;
     height: fit-content;
-    width: 350px;
+    width: fit-content;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 

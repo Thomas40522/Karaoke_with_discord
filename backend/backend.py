@@ -18,6 +18,7 @@ queue = []
 text_to_fire = []
 max_song = 20
 video_dimension = ['640', '1200']
+client_url = "hide"
 
 @bot.event
 async def on_ready():
@@ -29,7 +30,7 @@ async def sing(ctx, *, args: str):
         await ctx.send(f"{ctx.author.mention}The song queue is full, please wait for a while and try again")
         return
     import re
-    match = re.match(r'\{(.+?)\}\s+(\S+)', args)
+    match = re.match(r'\{([^}]+)\}\s*(.+)', args)
     if match:
         name = match.group(1)
         name_with_user = name + " - " + str(ctx.author)
@@ -62,11 +63,11 @@ async def textName(ctx, * args: str):
         
 @bot.command()
 async def help(ctx):
-    await ctx.send("To add a song: !sing {song name} Youtube_URL\nTo see all the songs: !getQueue\nTo text to the screen: !text your_message\nTo text with your name: !textName your_message")
+    await ctx.send("To add a song: !sing {song name} Youtube_URL (the embeding link might also work)\nTo see all the songs: !getQueue\nTo text to the screen: !text your_message\nTo text with your name: !textName your_message")
 
 # Flask app setup
 app = Flask(__name__)
-CORS(app, origins=["http://localhost:3000", "http://172.16.9.181:3000", "http://publichost:3000"])
+CORS(app, origins=["http://localhost:3000", "http://172.16.9.181:3000", "http://publichost:3000", "http://128.61.115.246:3000", "http://172.16.9.181:3000"])
 
 @app.route('/get_queue')
 def get_queue():
@@ -133,6 +134,50 @@ def set_video_dimension():
     video_dimension = [video_height, video_width]
     return jsonify(video_dimension)
 
+@app.route('/get_client_url')
+def get_client_url():
+    return jsonify(client_url)
+
+@app.route('/set_client_url', methods=['POST'])
+def set_client_url():
+    global client_url
+    data = request.get_json()
+    client_url = data.get('client_url')
+    
+    return jsonify(client_url)
+
+
+@app.route('/request_song', methods=['POST'])
+def request_song():
+    data = request.get_json()
+    song_name = data.get('song_name')
+    song_url = data.get('song_url')
+    
+    if song_name is None or song_url is None:
+        return jsonify({'error': 'Check the song name or url'}), 400
+    
+    if len(queue) >= max_song:
+        return jsonify({'error': 'Song Queue currently full'}), 400
+    else:
+        queue.append((song_name, song_url))
+        return jsonify({'success': 'Song is appended to the queue'}), 200
+
+@app.route('/send_text', methods=['POST'])
+def send_text():
+    data = request.get_json()
+    text = data.get('text')
+    text_to_fire.append(text)
+    return jsonify({'success': 'Text is ready to fire'}), 200
+
+@app.route('/restore_default')
+def restore_default():
+    global max_song 
+    max_song = 20
+    global video_dimension 
+    video_dimension = ['640', '1200']
+    return jsonify({'success': "setting is restored"}), 200
+
+
 @app.route('/fire_text')
 def fire_text():
     if len(text_to_fire) <= 0:
@@ -143,7 +188,7 @@ def fire_text():
 
 def process_queue():
     if len(queue) == 0:
-        queue.append(("海阔天空", "N6gICr1IVuQ"))
+        queue.append(("海阔天空", "https://www.youtube.com/watch?v=N6gICr1IVuQ"))
     return jsonify(queue)
 
 # Function to run Flask

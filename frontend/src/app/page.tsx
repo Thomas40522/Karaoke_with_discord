@@ -1,14 +1,14 @@
 'use client';
 import Image from "next/image";
+import { backend_endpoint_default } from "@/endpoints";
 import styles from "./page.module.css";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import YouTube from "react-youtube";
 import './page.css';
-
-const backend_endpoint = "http://127.0.0.1:3758"
-// const backend_endpoint = "http://47.254.65.42:3758"
+import { QRCodeSVG } from 'qrcode.react';
 
 export default function Home() {
+
   const [queue, setQueue] = useState<any[]>([]);
   const [maxSong, setMaxSong] = useState<number>(20);
   const [scrollText, setScrollText] = useState('');
@@ -19,10 +19,33 @@ export default function Home() {
   const [videoHeightTemp, setVideoHeightTemp] = useState(videoHeight)
   const [videoWidthTemp, setVideoWidthTemp] = useState(videoWidth)
   const [maxSongTemp, setMaxSongTemp] = useState<number>(maxSong)
+  const [clientUrl, setClientUrl] = useState("hide")
+  const [clientUrlTemp, setClientUrlTemp] = useState(clientUrl)
+  const [backend_endpoint, setBackend_endpoint] = useState(backend_endpoint_default)
+  const [backend_endpointTemp, setBackend_endpointTemp] = useState(backend_endpoint)
+
+  const default_embeding = `<iframe width="${videoWidth}" height="${videoHeight}" src="//player.bilibili.com/player.html?isOutside=true&aid=66348958&bvid=BV1u441117ko&cid=115104246&p=97" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"></iframe>`
+  const [externalembed, setExternalembed] = useState(default_embeding)
+  const [isYoutube, setIsYoutube] = useState(true);
+
+  const renderedEmbed = useMemo(() => {
+    return <div dangerouslySetInnerHTML={{ __html: externalembed }} />;
+  }, [externalembed]);
+
+  useEffect(() => {
+    if (isThisYoutube() != isYoutube) {
+      setIsYoutube(isThisYoutube())
+    }
+    if (externalembed != extract_embeding()) {
+      setExternalembed(extract_embeding())
+    }
+  },[queue])
+
 
   useEffect(() => {
     Get_Queue()
     Get_Max_Song()
+    Get_ClientUrl()
     Get_Video_Dimension()
     showScrollMessage()
     const interval1 = setInterval(Get_Queue, 30000);
@@ -47,6 +70,24 @@ export default function Home() {
     .then(data => {
       console.log('Fetched Data:', data);
       setMaxSong(data)
+    })
+    .catch(error => {
+      console.error('Error fetching data:', error);
+    });  
+  }
+
+  function Get_ClientUrl() {
+    fetch(backend_endpoint + '/get_client_url', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      mode: 'cors'
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Fetched Data:', data);
+      setClientUrl(data)
     })
     .catch(error => {
       console.error('Error fetching data:', error);
@@ -98,18 +139,19 @@ export default function Home() {
       },
       mode: 'cors'
     })
-      .then(response => response.json())
-      .then(data => {
-        console.log('Fetched Data:', data);
-        setQueue(data)
-      })
-      .catch(error => {
-        console.error('Error Dequeu:', error);
-      });
+    .then(response => response.json())
+    .then(data => {
+      console.log('Fetched Data:', data);
+      setQueue(data)
+    })
+    .catch(error => {
+      console.error('Error Dequeu:', error);
+    });
   }
 
   function refresh() {
     Get_Queue()
+    Get_ClientUrl()
     Get_Max_Song()
     showScrollMessage()
     Get_Video_Dimension()
@@ -164,6 +206,25 @@ export default function Home() {
     });
   }
 
+  function RestoreDefault() {
+    fetch(backend_endpoint + '/restore_default', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      mode: 'cors',
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Fetched Data:', data);
+      refresh()
+      setShowSettings(false)
+    })
+    .catch(error => {
+      console.error('Error Dequeu:', error);
+    });
+  }
+
   function Set_MaxSong() {
     fetch(backend_endpoint + '/set_max_song', {
       method: 'POST',
@@ -187,6 +248,35 @@ export default function Home() {
       console.log('Fetched Data:', data);
       setMaxSong(data)
       setMaxSongTemp(data)
+    })
+    .catch(error => {
+      console.error('Error Setting Maxsong:', error);
+    });
+  }
+
+  function Set_ClientUrl() {
+    fetch(backend_endpoint + '/set_client_url', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      mode: 'cors',
+      body: JSON.stringify({ client_url: clientUrlTemp }),
+    })
+    .then(
+      response => {
+        if (!response.ok) {
+          return response.json().then(err => {
+            throw new Error(err.error);
+          });
+        }
+        return response.json();
+      }
+    )
+    .then(data => {
+      console.log('Fetched Data:', data);
+      setClientUrl(data)
+      setClientUrlTemp(data)
     })
     .catch(error => {
       console.error('Error Setting Maxsong:', error);
@@ -242,18 +332,61 @@ export default function Home() {
     }
   }
 
+  function extract_embeding() {
+    if (queue.length > 0) {
+      var url = queue[0][1]
+      if(url.includes("<iframe")) {
+        if (/width=["']\d+["']/.test(url)) {
+          url = url.replace(/width=["']\d+["']/, `width="${videoWidth}"`);
+        } else {
+          url = url.replace(/<iframe/i, `<iframe width="${videoWidth}"`);
+        }
+        if (/height=["']\d+["']/.test(url)) {
+          url = url.replace(/height=["']\d+["']/, `height="${videoHeight}"`);
+        } else {
+          url = url.replace(/<iframe/i, `<iframe height="${videoHeight}"`);
+        }
+        return url
+      }
+      return default_embeding
+    }
+  }
+
+  function isThisYoutube() {
+    if (queue.length > 0) {
+      const url = queue[0][1]
+      return url.includes("youtube.com") || url.includes("youtu.be");
+    } else {
+      return true;
+    }
+  }
+
   function handle_save() {
     setVideoHeight(videoHeightTemp)
     setVideoWidth(videoWidthTemp)
+    setBackend_endpoint(backend_endpointTemp)
     Set_MaxSong()
+    Set_ClientUrl()
     Set_Video_Dimension()
+  }
+
+  function handle_restore() {
+    setBackend_endpoint(backend_endpoint_default)
+    setBackend_endpointTemp(backend_endpoint_default)
+    RestoreDefault()
   }
 
   function handle_setting_show() {
     setVideoHeightTemp(videoHeight)
     setVideoWidthTemp(videoWidth)
     setMaxSongTemp(maxSong)
+    setClientUrlTemp(clientUrl)
+    setBackend_endpointTemp(backend_endpoint)
     setShowSettings(true)
+  }
+
+  function handle_skip() {
+    Dequeue()
   }
 
 
@@ -261,7 +394,9 @@ export default function Home() {
     <div className="app-container">
       {/* Top bar */}
       <div className="top-bar">
-        <h1>Karaoke</h1>
+        <span id="top-text">
+          <h1>Karaoke</h1>
+        </span>
         <button className="settings-button" onClick={handle_setting_show}>Settings</button>
       </div>
 
@@ -283,7 +418,16 @@ export default function Home() {
               Video Width:
               <input type="string" value={videoWidthTemp} onChange={(e) => setVideoWidthTemp(e.target.value)}/>
             </label>
+            <label>
+              Client Url:
+              <input type="string" value={clientUrlTemp} onChange={(e) => setClientUrlTemp(e.target.value)}/>
+            </label>
+            <label>
+              Backend Endpoint:
+              <input type="string" value={backend_endpointTemp} onChange={(e) => setBackend_endpointTemp(e.target.value)}/>
+            </label>
             <button className="settings-button" onClick={handle_save}>Save</button>
+            <button className="settings-button" onClick={handle_restore}>Default</button>
           </div>
         </div>
       )}
@@ -293,37 +437,44 @@ export default function Home() {
       <div className="main-content">
         {/* Song list */}
         <div className="song-list">
-          <h2>Song Queue ({queue.length}/{maxSong})</h2>
-          <div id="queue-container">
-            {queue.length > 0 ? (
-              queue.map((item, index) => (
-                <div key={index} className="song-item">
-                  <strong className="name-item">{item[0]}</strong>
-                  <span
-                    className="song-action"
-                    title="Move to top"
-                    onClick={()=>Push_Top(index)}
-                  >
-                    ↑
-                  </span>
-                </div>
-              ))
-            ) : (
-              <p>No songs in the queue.</p>
-            )}
+          <div>
+            <h2>Song Queue ({queue.length}/{maxSong})</h2>
+            <div id="queue-container">
+              {queue.length > 0 ? (
+                queue.map((item, index) => (
+                  <div key={index} className="song-item">
+                    <strong className="name-item">{item[0]}</strong>
+                    <span
+                      className="song-action"
+                      title="Move to top"
+                      onClick={()=>Push_Top(index)}
+                    >
+                      ↑
+                    </span>
+                  </div>
+                ))
+              ) : (
+                <p>No songs in the queue.</p>
+              )}
+            </div>
           </div>
+          {clientUrl != "hide" &&
+          (<QRCodeSVG value={clientUrl} size={60} level="H"/>)}
         </div>
 
         {/* Video */}
         <div className="video-section">
-          <YouTube videoId={extract_link()} opts={opts} onEnd={Dequeue} />
+          {isYoutube ? (
+          <YouTube videoId={extract_link()} opts={opts} onEnd={handle_skip} />) :
+          (renderedEmbed)
+          }
         </div>
       </div>
 
       {/* Bottom buttons */}
       <div className="button-bar">
         <button onClick={refresh} className="action-button">Refresh</button>
-        <button onClick={Dequeue} className="action-button">Skip</button>
+        <button onClick={handle_skip} className="action-button">Skip</button>
         <div className="scroll-message-container">
         <div className="scroll-message" id="scrollMessage" key={key}>
           {scrollText}

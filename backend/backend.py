@@ -196,7 +196,7 @@ def process_queue():
 
 # Function to run Flask
 def run_flask():
-    app.run(host='0.0.0.0', port=3758)
+    app.run(host='0.0.0.0', port=3758, ssl_context=('feiyangxie.com_ssl_certificate.cer', '*.feiyangxie.com_private_key.key'))
 
 # Start Flask in a new thread
 if __name__ == "__main__":

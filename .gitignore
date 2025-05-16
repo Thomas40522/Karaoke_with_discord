@@ -3,3 +3,5 @@ frontend/node_modules
 **/.DS_Store
 frontend/.next/
 .next/
+backend/feiyangxie.com_ssl_certificate.cer
+backend/*.feiyangxie.com_private_key.key

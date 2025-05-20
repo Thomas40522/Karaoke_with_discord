@@ -101,6 +101,21 @@ def move_to_front():
         queue.insert(1, item)
     return process_queue()
 
+@app.route('/remove', methods=['POST'])
+def remove():
+    data = request.get_json()
+    index = data.get('index')
+
+    if index is None or not isinstance(index, int):
+        return jsonify({'error': 'Invalid or missing index'}), 400
+
+    if index < 0 or index >= len(queue):
+        return jsonify({'error': 'Index out of bounds'}), 400
+
+    queue.pop(index)
+    return process_queue()
+
+
 @app.route('/get_max_song')
 def get_max_song():
     return jsonify(max_song)

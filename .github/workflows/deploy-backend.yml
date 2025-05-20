@@ -27,8 +27,8 @@ jobs:
             git pull origin main
             cd backend || exit 1
 
-            echo "Installing latest requirements"
-            pip install -r requirements.txt
+            echo "Installing latest requirement"
+            pip install -r requirement.txt
 
             echo "Stopping existing backend"
             if tmux has-session -t karaoke_backend 2>/dev/null; then

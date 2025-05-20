@@ -185,6 +185,34 @@ export default function Home() {
     });
   }
 
+  function Remove(index:Number) {
+    fetch(backend_endpoint + '/remove', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      mode: 'cors',
+      body: JSON.stringify({ index: index }),
+    })
+    .then(      
+      response => {
+        if (!response.ok) {
+          return response.json().then(err => {
+            throw new Error(err.error);
+          });
+        }
+        return response.json();
+      }
+    )
+    .then(data => {
+      console.log('Fetched Data:', data);
+      setQueue(data)
+    })
+    .catch(error => {
+      console.error('Error Dequeu:', error);
+    });
+  }
+
   function showScrollMessage() {
     fetch(backend_endpoint + '/fire_text', {
       method: 'GET',
@@ -450,14 +478,14 @@ export default function Home() {
                     <span>
                       <span
                         className="song-action"
-                        title="Move to top"
-                        onClick={()=>Push_Top(index)}
+                        title="Remove"
+                        onClick={()=>Remove(index)}
                       >
                         ✕
                       </span>
                       <span
                         className="song-action"
-                        title="Remove"
+                        title="Push to top"
                         onClick={()=>Push_Top(index)}
                       >
                         ↑

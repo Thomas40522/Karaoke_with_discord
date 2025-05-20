@@ -111,7 +111,7 @@ def remove():
 
     if index < 0 or index >= len(queue):
         return jsonify({'error': 'Index out of bounds'}), 400
-
+    
     queue.pop(index)
     return process_queue()
 

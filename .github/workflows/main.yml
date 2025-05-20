@@ -14,12 +14,12 @@ jobs:
       - name: Set up SSH
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/pikachu.pem
-          chmod 600 ~/.ssh/pikachu.pem
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/pikachu
+          chmod 600 ~/.ssh/pikachu
           ssh-keyscan -H ${{ secrets.SSH_HOST}} >> ~/.ssh/known_hosts
       - name: Deploy via SSH
         run: |
-          ssh -i ~/.ssh/pikachu.pem root@${{ secrets.SSH_HOST }} << 'EOF'
+          ssh -i ~/.ssh/pikachu root@${{ secrets.SSH_HOST }} << 'EOF'
             cd Desktop/Services/Karaoke_with_discord
             git pull origin main
             cd backend

@@ -1,0 +1,31 @@
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - backend/**
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4.2.2
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secret.SSH_PRIVATE_KEY }}" > ~/.ssh/pikachu.pem
+          chmod 600 ~/.ssh/pikachu.pem
+          ssh-keyscan -H ${{ secret.SSH_HOST}} >> ~/.ssh/known_hosts
+      - name: Deploy via SSH
+        run: |
+          ssh -i ~/.ssh/pikachu.pem root@${{ secret.SSH_HOST }} << 'EOF'
+            cd Desktop/Services/Karaoke_with_discord
+            git pull origin main
+            cd backend
+            tmux kill-session -t karaoke_backend
+            tmux new-session -d -s karaoke_backend '
+              python3.8 backend.py
+            '
+          EOF
+            

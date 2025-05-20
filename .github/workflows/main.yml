@@ -14,18 +14,21 @@ jobs:
       - name: Set up SSH
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/pikachu
-          chmod 600 ~/.ssh/pikachu
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/pikachu.pem
+          chmod 600 ~/.ssh/pikachu.pem
           ssh-keyscan -H ${{ secrets.SSH_HOST}} >> ~/.ssh/known_hosts
       - name: Deploy via SSH
         run: |
-          ssh -i ~/.ssh/pikachu root@${{ secrets.SSH_HOST }} << 'EOF'
-            cd Desktop/Services/Karaoke_with_discord
+          ssh -i -o StrictHostKeyChecking=no ~/.ssh/pikachu.pem root@${{ secrets.SSH_HOST }} << 'EOF'
+            cd ~/Desktop/Services/Karaoke_with_discord
             git pull origin main
             cd backend
-            tmux kill-session -t karaoke_backend
+            if tmux has-session -t karaoke_backend 2>/dev/null; then
+              tmux kill-session -t karaoke_backend
+            fi
             tmux new-session -d -s karaoke_backend '
               python3.8 backend.py
             '
+            echo "Deployment Completed"
           EOF
             

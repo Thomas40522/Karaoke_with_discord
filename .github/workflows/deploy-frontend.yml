@@ -15,6 +15,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18'
+      - name: Install rsync
+        run: |
+          sudo apt install -y rsync
       - name: Build Frontend
         working-directory: frontend
         run: |

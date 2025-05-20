@@ -19,7 +19,7 @@ jobs:
           ssh-keyscan -H ${{ secrets.SSH_HOST}} >> ~/.ssh/known_hosts
       - name: Deploy via SSH
         run: |
-          ssh -i -o StrictHostKeyChecking=no ~/.ssh/pikachu.pem root@${{ secrets.SSH_HOST }} << 'EOF'
+          ssh -i ~/.ssh/pikachu.pem -o StrictHostKeyChecking=no root@${{ secrets.SSH_HOST }} << 'EOF'
             cd ~/Desktop/Services/Karaoke_with_discord
             git pull origin main
             cd backend

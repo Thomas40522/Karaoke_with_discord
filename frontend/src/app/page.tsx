@@ -447,12 +447,21 @@ export default function Home() {
                 queue.map((item, index) => (
                   <div key={index} className="song-item">
                     <strong className="name-item">{item[0]}</strong>
-                    <span
-                      className="song-action"
-                      title="Move to top"
-                      onClick={()=>Push_Top(index)}
-                    >
-                      ↑
+                    <span>
+                      <span
+                        className="song-action"
+                        title="Move to top"
+                        onClick={()=>Push_Top(index)}
+                      >
+                        ✕
+                      </span>
+                      <span
+                        className="song-action"
+                        title="Remove"
+                        onClick={()=>Push_Top(index)}
+                      >
+                        ↑
+                      </span>
                     </span>
                   </div>
                 ))

@@ -28,7 +28,8 @@ jobs:
           ssh-keyscan -H ${{ secrets.SSH_HOST}} >> ~/.ssh/known_hosts
       - name: Upload built files via SSH
         run: |
-          scp -i ~/.ssh/pikachu.pem -r frontend/.next root@${{ secrets.SSH_HOST }}:~/Desktop/Services/Karaoke_with_discord/frontend
+          rsync -avz -e "ssh -i ~/.ssh/pikachu.pem -o StrictHostKeyChecking=no" \
+          frontend/.next/ root@${{ secrets.SSH_HOST }}:~/Desktop/Services/Karaoke_with_discord/frontend/.next/
       - name: Deploy via SSH
         run: |
           ssh -i ~/.ssh/pikachu.pem -o StrictHostKeyChecking=no root@${{ secrets.SSH_HOST }} << 'EOF'

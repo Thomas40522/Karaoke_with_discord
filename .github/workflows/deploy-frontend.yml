@@ -15,9 +15,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18'
-      - name: Install rsync
-        run: |
-          sudo apt install -y rsync
       - name: Build Frontend
         working-directory: frontend
         run: |
@@ -31,8 +28,8 @@ jobs:
           ssh-keyscan -H ${{ secrets.SSH_HOST}} >> ~/.ssh/known_hosts
       - name: Upload built files via SSH
         run: |
-          rsync -avz -e "ssh -i ~/.ssh/pikachu.pem -o StrictHostKeyChecking=no" \
-          frontend/.next/ root@${{ secrets.SSH_HOST }}:~/Desktop/Services/Karaoke_with_discord/frontend/.next/
+          ssh -i ~/.ssh/pikachu.pem -o StrictHostKeyChecking=no root@${{ secrets.SSH_HOST }} "rm -rf ~/Desktop/Services/Karaoke_with_discord/frontend/.next"
+          scp -i ~/.ssh/pikachu.pem -r frontend/.next root@${{ secrets.SSH_HOST }}:~/Desktop/Services/Karaoke_with_discord/frontend/
       - name: Deploy via SSH
         run: |
           ssh -i ~/.ssh/pikachu.pem -o StrictHostKeyChecking=no root@${{ secrets.SSH_HOST }} << 'EOF'

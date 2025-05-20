@@ -5,6 +5,7 @@ import threading
 from flask_cors import CORS
 from dotenv import load_dotenv
 import os
+import re
 
 load_dotenv()
 # Discord bot setup
@@ -29,7 +30,6 @@ async def sing(ctx, *, args: str):
     if len(queue) >= max_song:
         await ctx.send(f"{ctx.author.mention}The song queue is full, please wait for a while and try again")
         return
-    import re
     match = re.match(r'\{([^}]+)\}\s*(.+)', args)
     if match:
         name = match.group(1)

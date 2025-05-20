@@ -1,0 +1,6 @@
+FROM python:3.14-rc
+WORKDIR /backend
+COPY . .
+RUN pip install -r requirement.txt
+CMD ["python", "backend.py"]
+EXPOSE 3758

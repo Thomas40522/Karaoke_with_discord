@@ -1,0 +1,56 @@
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - frontend/**
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4.2.2
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - name: Build Frontend
+        working-directory: frontend
+        run: |
+          npm install
+          npm run build
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/pikachu.pem
+          chmod 600 ~/.ssh/pikachu.pem
+          ssh-keyscan -H ${{ secrets.SSH_HOST}} >> ~/.ssh/known_hosts
+      - name: Upload built files via SSH
+        run: |
+          scp -i ~/.ssh/pikachu.pem -r frontend/.next root@${{ secrets.SSH_HOST }}:~/Desktop/Services/Karaoke_with_discord/frontend
+      - name: Deploy via SSH
+        run: |
+          ssh -i ~/.ssh/pikachu.pem -o StrictHostKeyChecking=no root@${{ secrets.SSH_HOST }} << 'EOF'
+            set -e
+            cd ~/Desktop/Services/Karaoke_with_discord || exit 1 
+
+            echo "Pulling latest code..."
+            git pull origin main
+            cd frontend || exit 1
+
+            echo "Installing latest package"
+            npm install
+
+            echo "Stopping existing frontend"
+            if tmux has-session -t karaoke_frontend 2>/dev/null; then
+              tmux kill-session -t karaoke_frontend
+            fi
+
+            echo "Starting new frontend"
+            tmux new-session -d -s karaoke_frontend '
+              NODE_ENV=production node server.js
+            '
+            echo "Deployment Completed"
+          EOF
+            

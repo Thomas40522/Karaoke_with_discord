@@ -20,12 +20,22 @@ jobs:
       - name: Deploy via SSH
         run: |
           ssh -i ~/.ssh/pikachu.pem -o StrictHostKeyChecking=no root@${{ secrets.SSH_HOST }} << 'EOF'
-            cd ~/Desktop/Services/Karaoke_with_discord
+            set -e
+            cd ~/Desktop/Services/Karaoke_with_discord || exit 1 
+
+            echo "Pulling latest code..."
             git pull origin main
-            cd backend
+            cd backend || exit 1
+
+            echo "Installing latest requirements"
+            pip install -r requirements.txt
+
+            echo "Stopping existing backend"
             if tmux has-session -t karaoke_backend 2>/dev/null; then
               tmux kill-session -t karaoke_backend
             fi
+
+            echo "Starting new backend"
             tmux new-session -d -s karaoke_backend '
               python3.8 backend.py
             '

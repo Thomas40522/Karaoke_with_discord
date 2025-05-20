@@ -360,6 +360,7 @@ export default function Home() {
     }
   }
 
+  // assign corresponding width and height to embbeding
   function extract_embeding() {
     if (queue.length > 0) {
       var url = queue[0][1]
@@ -380,6 +381,7 @@ export default function Home() {
     }
   }
 
+  // check if the video is from youtube
   function isThisYoutube() {
     if (queue.length > 0) {
       const url = queue[0][1]
